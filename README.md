@@ -2,6 +2,8 @@
 
 Project pour Valeur C1 2018: CouchDB
 
+Elie El-Khoury
+
 Presentation: - Intro to CouchDB
               - Qu'est-ce qu'un db orienté document
               - Concepts de base et API REST
