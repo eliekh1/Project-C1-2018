@@ -1,0 +1,78 @@
+curl --version
+
+curl -X PUT http://127.0.0.1:5984/testdb
+curl -X DELETE http://127.0.0.1:5984/testdb
+
+
+//create db
+
+curl -X PUT http://127.0.0.1:5984/notes
+curl -X GET http://127.0.0.1:5984/_all_dbs
+
+
+//create document
+
+curl -X PUT http://127.0.0.1:5984/notes/001 -d "{\"nom\":\"create\"}"
+curl -X GET http://127.0.0.1:5984/notes/001
+
+
+//update document
+
+curl -X PUT http://127.0.0.1:5984/notes/001 -d "{\"nom\":\"update\",\"_rev\":\"\"}"
+
+
+//delete document
+
+curl -X DELETE http://127.0.0.1:5984/notes/001?rev=
+
+
+//create document with uuids
+
+curl -X GET http://127.0.0.1:5984/_uuids
+curl -X PUT http://127.0.0.1:5984/notes/ -d "{\"nom\":\"John\",\"prenom\":\"Doe\",\"marks\":{\"Java\": 13,\"Reseaux\": 6,\"Maths\": 11}}"
+
+
+//get all documents
+
+curl -X GET http://127.0.0.1:5984/notes/_all_docs
+curl -X GET http://127.0.0.1:5984/notes/_all_docs?include_docs=true
+
+
+//get views
+
+curl -X GET http://127.0.0.1:5984/notes/_design/GroupByCourse/_view/marks
+
+
+GroupByCourse:
+
+function(doc) {
+    var matiere, note, key;
+    if (doc.nom && doc.marks) {
+        for (matiere in doc.marks) {
+            note = [doc.nom,doc.marks[matiere]];
+            key = matiere;
+            emit(key, note);
+        }
+    }
+}
+
+
+StudentAvg:
+
+function(doc) {
+    var matiere,note, key;
+    if (doc.nom && doc.prenom && doc.marks) {
+        for (matiere in doc.marks) {
+            note = doc.marks[matiere];
+            key = [doc.nom,doc.prenom];
+            emit(key, note);
+        }
+    }
+}
+
+function (keys, values, rereduce) {
+   
+	return sum(values)/ values.length;
+
+}
+
